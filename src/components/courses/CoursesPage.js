@@ -3,42 +3,33 @@ import { connect } from "react-redux";
 import * as courseActions from "../../redux/actions/courseActions";
 import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
+import CourseList from "./CourseList";
+import * as authorActions from "../../redux/actions/authorActions";
 
 class CoursesPage extends React.Component {
-  state = {
-    course: {
-      title: ""
+  componentDidMount() {
+    const { courses, authors, actions } = this.props;
+    if (courses.length === 0) {
+      actions.loadCourses().catch((error) => {
+        // "catch" errors from the "promise"
+        alert("Loading Courses Failed " + error);
+      });
     }
-  };
 
-  // Arrow functions inherit the binding context of their enclosing scope.
-  // This is b/c arrow functions do not have a "this" object bound inside them.
-  handleChange = event => {
-    const course = { ...this.state.course, title: event.target.value };
-    this.setState({ course });
-  };
-
-  handleSubmit = event => {
-    event.preventDefault();
-    this.props.actions.createCourse(this.state.course);
-  };
+    if (authors.length === 0) {
+      actions.loadAuthors().catch((error) => {
+        // "catch" errors from the "promise"
+        alert("Loading Authors Failed " + error);
+      });
+    }
+  }
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
+      <>
         <h2>Courses</h2>
-        <h3>Add Course</h3>
-        <input
-          type="text"
-          onChange={this.handleChange}
-          value={this.state.course.title}
-        />
-        <input type="submit" value="Save" />
-
-        {this.props.courses.map(course => (
-          <div key={course.title}> {course.title} </div>
-        ))}
-      </form>
+        <CourseList courses={this.props.courses} />
+      </>
     );
   }
 }
@@ -46,12 +37,25 @@ class CoursesPage extends React.Component {
 // specify what sh/d be passed in; "dispatch" is passed in by connect as a default for "mapDispathToProps"
 CoursesPage.propTypes = {
   courses: PropTypes.array.isRequired,
-  actions: PropTypes.object.isRequired
+  actions: PropTypes.object.isRequired,
+  authors: PropTypes.array.isRequired,
 };
 
 // determine props recv'd by child components
 function mapStateToProps(state) {
-  return { courses: state.courses }; // request only the data you component needs to reduce needless refreshes
+  return {
+    courses:
+      state.authors.length === 0
+        ? []
+        : state.courses.map((course) => {
+            return {
+              ...course,
+              authorName: state.authors.find((a) => a.id === course.authorId)
+                .name,
+            };
+          }),
+    authors: state.authors,
+  }; // request only the data you component needs to reduce needless refreshes
 }
 
 // "mapDispatchToPage" as an object
@@ -62,7 +66,10 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     // createCourse: course => dispatch(courseActions.createCourse(course))
-    actions: bindActionCreators(courseActions, dispatch)
+    actions: {
+      loadCourses: bindActionCreators(courseActions.loadCourses, dispatch),
+      loadAuthors: bindActionCreators(authorActions.loadAuthors, dispatch),
+    },
   };
 }
 
