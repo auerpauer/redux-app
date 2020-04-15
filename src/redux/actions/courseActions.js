@@ -8,12 +8,12 @@ function loadCourseSuccess(courses) {
   return { type: types.LOAD_COURSES_SUCCESS, courses };
 }
 
-function updateCourseSuccess(courses) {
-  return { type: types.UPDATE_COURSE_SUCCESS, courses };
+function updateCourseSuccess(course) {
+  return { type: types.UPDATE_COURSE_SUCCESS, course };
 }
 
-function createCourseSuccess(courses) {
-  return { type: types.CREATE_COURSE_SUCCESS, courses };
+function createCourseSuccess(course) {
+  return { type: types.CREATE_COURSE_SUCCESS, course };
 }
 
 // thunks

@@ -73,10 +73,24 @@ ManageCoursePage.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
+// in redux terms, this is a "selector" b/c it selects data from the redux store
+export function getCourseBySlug(courses, slug) {
+  return courses.find((course) => course.slug === slug) || null;
+}
+
 // determine props recv'd by child components
-function mapStateToProps(state) {
+// pulling all the courses in "getCourseBySlug" using "state.courses" is an async call
+function mapStateToProps(state, ownProps) {
+  console.log(ownProps.match.params);
+  //const slug = ownProps.match.params.slug;
+  const slug = ownProps.location.pathname.split("/").reverse()[0];
+  const course =
+    slug && state.courses.length > 0
+      ? getCourseBySlug(state.courses, slug)
+      : newCourse;
+  debugger;
   return {
-    course: newCourse,
+    course: course,
     courses: state.courses,
     authors: state.authors,
   }; // request only the data you component needs to reduce needless refreshes
