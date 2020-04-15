@@ -34,7 +34,7 @@ function ManageCoursePage({
         alert("Loading Authors Failed " + error);
       });
     }
-  }, [props.course]); // empty array of objects to check means "only run once", like ComponentDidMount()
+  }, []); // empty array of objects to check means "only run once", like ComponentDidMount()
 
   function handleChange(event) {
     const { name, value } = event.target;
